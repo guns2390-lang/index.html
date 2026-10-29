@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расчет коммунальных услуг</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #e8e8e8;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-group .description {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 60px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-wrapper .unit {
+            position: absolute;
+            right: 15px;
+            color: #888;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            padding-top: 15px;
+            margin-top: 5px;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .result-item .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .result-item .value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 15px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #e8e8e8;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .tab {
+                font-size: 14px;
+                padding: 15px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Расчет коммунальных услуг</h1>
+            <p>Калькулятор для сдачи квартир</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('tomsk')">Томск</button>
+            <button class="tab" onclick="switchTab('seversk')">Северск</button>
+        </div>
+
+        <div class="content">
+            <!-- Томск -->
+            <div id="tomsk" class="tab-content active">
+                <div class="input-group">
+                    <label>Холодное водоснабжение</label>
+                    <div class="description">Тариф: 93 руб/куб.м</div>
+                    <div class="input-wrapper">
+                        <input type="number" id="tomsk-cold" placeholder="0" step="0.01" oninput="calculateTomsk()">
+                        <span class="unit">куб.м</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Горячее водоснабжение</label>
+                    <div class="description">Тариф: 265 руб/куб.м</div>
+                    <div class="input-wrapper">
+                        <input type="number" id="tomsk-hot" placeholder="0" step="0.01" oninput="calculateTomsk()">
+                        <span class="unit">куб.м</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Водоотведение</label>
+                    <div class="description">Тариф: 63 руб/куб.м (объем = холодное + горячее)</div>
+                    <div class="input-wrapper">
+                        <input type="text" id="tomsk-drainage" placeholder="0" readonly>
+                        <span class="unit">куб.м</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Электроэнергия</label>
+                    <div class="description">Тариф: 8 руб/кВт·ч</div>
+                    <div class="input-wrapper">
+                        <input type="number" id="tomsk-electric" placeholder="0" step="1" oninput="calculateTomsk()">
+                        <span class="unit">кВт·ч</span>
+                    </div>
+                </div>
+
+                <div class="result">
+                    <div class="result-item">
+                        <span class="label">Холодное водоснабжение:</span>
+                        <span class="value" id="tomsk-cold-cost">0 ₽</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Горячее водоснабжение:</span>
+                        <span class="value" id="tomsk-hot-cost">0 ₽</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Водоотведение:</span>
+                        <span class="value" id="tomsk-drainage-cost">0 ₽</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Электроэнергия:</span>
+                        <span class="value" id="tomsk-electric-cost">0 ₽</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Итого:</span>
+                        <span class="value" id="tomsk-total">0 ₽</span>
+                    </div>
+                </div>
+
+                <button class="reset-btn" onclick="resetTomsk()">Сбросить</button>
+            </div>
+
+            <!-- Северск -->
+            <div id="seversk" class="tab-content">
+                <div class="input-group">
+                    <label>Холодное водоснабжение</label>
+                    <div class="description">Тариф: 81 руб/куб.м</div>
+                    <div class="input-wrapper">
+                        <input type="number" id="seversk-cold" placeholder="0" step="0.01" oninput="calculateSeversk()">
+                        <span class="unit">куб.м</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Горячее водоснабжение</label>
+                    <div class="description">Тариф: 242 руб/куб.м</div>
+                    <div class="input-wrapper">
+                        <input type="number" id="seversk-hot" placeholder="0" step="0.01" oninput="calculateSeversk()">
+                        <span class="unit">куб.м</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Водоотведение</label>
+                    <div class="description">Тариф: 35 руб/куб.м (объем = холодное + горячее)</div>
+                    <div class="input-wrapper">
+                        <input type="text" id="seversk-drainage" placeholder="0" readonly>
+                        <span class="unit">куб.м</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Электроэнергия</label>
+                    <div class="description">Тариф: 5,1 руб/кВт·ч</div>
+                    <div class="input-wrapper">
+                        <input type="number" id="seversk-electric" placeholder="0" step="1" oninput="calculateSeversk()">
+                        <span class="unit">кВт·ч</span>
+                    </div>
+                </div>
+
+                <div class="result">
+                    <div class="result-item">
+                        <span class="label">Холодное водоснабжение:</span>
+                        <span class="value" id="seversk-cold-cost">0 ₽</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Горячее водоснабжение:</span>
+                        <span class="value" id="seversk-hot-cost">0 ₽</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Водоотведение:</span>
+                        <span class="value" id="seversk-drainage-cost">0 ₽</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Электроэнергия:</span>
+                        <span class="value" id="seversk-electric-cost">0 ₽</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Итого:</span>
+                        <span class="value" id="seversk-total">0 ₽</span>
+                    </div>
+                </div>
+
+                <button class="reset-btn" onclick="resetSeversk()">Сбросить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function formatNumber(num) {
+            return num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$& ').replace('.', ',');
+        }
+
+        function calculateTomsk() {
+            const cold = parseFloat(document.getElementById('tomsk-cold').value) || 0;
+            const hot = parseFloat(document.getElementById('tomsk-hot').value) || 0;
+            const electric = parseFloat(document.getElementById('tomsk-electric').value) || 0;
+
+            const drainage = cold + hot;
+            document.getElementById('tomsk-drainage').value = drainage.toFixed(2);
+
+            const coldCost = cold * 93;
+            const hotCost = hot * 265;
+            const drainageCost = drainage * 63;
+            const electricCost = electric * 8;
+            const total = coldCost + hotCost + drainageCost + electricCost;
+
+            document.getElementById('tomsk-cold-cost').textContent = formatNumber(coldCost) + ' ₽';
+            document.getElementById('tomsk-hot-cost').textContent = formatNumber(hotCost) + ' ₽';
+            document.getElementById('tomsk-drainage-cost').textContent = formatNumber(drainageCost) + ' ₽';
+            document.getElementById('tomsk-electric-cost').textContent = formatNumber(electricCost) + ' ₽';
+            document.getElementById('tomsk-total').textContent = formatNumber(total) + ' ₽';
+        }
+
+        function calculateSeversk() {
+            const cold = parseFloat(document.getElementById('seversk-cold').value) || 0;
+            const hot = parseFloat(document.getElementById('seversk-hot').value) || 0;
+            const electric = parseFloat(document.getElementById('seversk-electric').value) || 0;
+
+            const drainage = cold + hot;
+            document.getElementById('seversk-drainage').value = drainage.toFixed(2);
+
+            const coldCost = cold * 81;
+            const hotCost = hot * 242;
+            const drainageCost = drainage * 35;
+            const electricCost = electric * 5.1;
+            const total = coldCost + hotCost + drainageCost + electricCost;
+
+            document.getElementById('seversk-cold-cost').textContent = formatNumber(coldCost) + ' ₽';
+            document.getElementById('seversk-hot-cost').textContent = formatNumber(hotCost) + ' ₽';
+            document.getElementById('seversk-drainage-cost').textContent = formatNumber(drainageCost) + ' ₽';
+            document.getElementById('seversk-electric-cost').textContent = formatNumber(electricCost) + ' ₽';
+            document.getElementById('seversk-total').textContent = formatNumber(total) + ' ₽';
+        }
+
+        function resetTomsk() {
+            document.getElementById('tomsk-cold').value = '';
+            document.getElementById('tomsk-hot').value = '';
+            document.getElementById('tomsk-drainage').value = '';
+            document.getElementById('tomsk-electric').value = '';
+            calculateTomsk();
+        }
+
+        function resetSeversk() {
+            document.getElementById('seversk-cold').value = '';
+            document.getElementById('seversk-hot').value = '';
+            document.getElementById('seversk-drainage').value = '';
+            document.getElementById('seversk-electric').value = '';
+            calculateSeversk();
+        }
+    </script>
+</body>
+</html>
